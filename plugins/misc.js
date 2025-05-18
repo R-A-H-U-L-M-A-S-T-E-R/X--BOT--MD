@@ -41,7 +41,7 @@ Sparky({
 		m
 	}) => {
 		const start = new Date().getTime();
-		let pong = await m.sendMsg(m.jid, "_Checking Ping..._", {
+		let pong = await m.sendMsg(m.jid, "_RAHUL-AI PING..._", {
 			quoted: m
 		});
 		const end = new Date().getTime();
