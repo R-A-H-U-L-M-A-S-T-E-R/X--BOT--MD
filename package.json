@@ -27,6 +27,7 @@
     "google-tts-api": "^2.0.2",
     "jimp": "^0.16.13",
     "node-cron": "^3.0.3",
+    "node-cache": "^5.1.2",
     "node-fetch": "^2.6.0",
     "node-webpmux": "^3.2.0",
     "pg": "^8.13.1",
