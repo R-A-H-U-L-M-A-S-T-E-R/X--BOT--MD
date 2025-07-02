@@ -2,6 +2,7 @@ const { Sparky, isPublic, spdl } = require("../lib");
 const { getJson, extractUrlsFromText, getString, isUrl } = require("./pluginsCore");
 const axios = require('axios');
 const fetch = require('node-fetch');
+const gis = require("g-i-s");
 const config = require("../config.js");
 const lang = getString('download');
 
@@ -19,26 +20,47 @@ Sparky(
         args = args || m.quoted?.text;
         if (!args) return await m.reply(lang.NEED_URL);
         //if (isUrl(args)) return await m.reply(lang.NOT_URL);
-        let dl = await client.sendMessage(m.jid, {
-            text: lang.DOWNLOADING
-        }, {
-            quoted: m
-        })
         try {
+            await m.react('⬇️');
             let response = await getJson(config.API + "/api/downloader/igdl?url=" + args);
             for (let i of response.data) {
                 await m.sendMsg(m.jid, i.url, { quoted: m }, i.type)
             }
+            await m.react('✅');
         } catch (e) {
             console.log(e);
-            client.sendMessage(m.jid, {
-                text: lang.ERROR, edit: dl.key
-            })
+            await m.react('❌');
         }
     }
 );
 
-
+Sparky({
+    name: "gpt",
+    fromMe: true,
+    category: "misc",
+    desc: "Query GPT-3 with a prompt"
+},
+async ({ m, client, args }) => {
+    // Get arguments either from command or quoted message
+    args = args || m.quoted?.text;
+    
+    // Check if prompt exists
+    if (!args) return await m.reply("Please provide a prompt or quote a message");
+    
+    try {
+        // Make API request
+        const q = await getJson(`${config.API}/api/search/gpt3?search=${encodeURIComponent(args)}`);
+        
+        // Check if response is valid
+        if (!q?.data?.response) throw new Error("Invalid API response");
+        
+        // Send the response
+        return await m.reply(q.data.response);
+    } catch (error) {
+        console.error("GPT Error:", error);
+        return await m.reply("An error occurred while processing your request");
+    }
+});
 // Sparky({
 //     name: "apk",
 //     fromMe: isPublic,
@@ -73,6 +95,48 @@ Sparky(
 //     }
 // });
 
+Sparky(
+    {
+        name: "img",
+        fromMe: isPublic,
+        desc: "Google Image search",
+        category: "downloader",
+    },
+    async ({
+        m, client, args
+    }) => {
+        try {
+            async function gimage(query, amount = 5) {
+                let list = [];
+                return new Promise((resolve, reject) => {
+                    gis(query, async (error, result) => {
+                        for (
+                            var i = 0;
+                            i < (result.length < amount ? result.length : amount);
+                            i++
+                        ) {
+                            list.push(result[i].url);
+                            resolve(list);
+                        }
+                    });
+                });
+            }
+            if (!args) return await m.reply("Enter Query,Number");
+            let [query,
+                amount] = args.split(",");
+            let result = await gimage(query, amount);
+            await m.reply(
+                `_Downloading ${amount || 5} images for ${query}_`
+            );
+            for (let i of result) {
+                await m.sendMsg(m.jid, i, {}, "image")
+            }
+
+        } catch (e) {
+            console.log(e)
+        }
+    }
+);
 
 Sparky({
     name: "pintrest",
