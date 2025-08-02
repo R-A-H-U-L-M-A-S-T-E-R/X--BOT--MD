@@ -120,7 +120,7 @@ m.sendMsg(m.jid , `_@${m.sender.split("@")[0]}_`  , {   mentions : [m.sender]} )
                 name: "fullpp",
                 fromMe: true,
                 category: "sudo",
-                desc: "fullpp"
+                desc: "update profile in fullpp"
             }, async ({
                     m, client, args
                 }) => {

@@ -143,8 +143,8 @@ async ( {
 	  m, args
 }) => {
 	if (args?.toLowerCase() == "public" || args?.toLowerCase() == "private"){
-		return await app.setVar("WORK_TYPE",args,m)
-		m.reply(`_Mode Sucessfuly Changed To: ${args}_`);
+		await app.setVar("WORK_TYPE",args,m)
+		return m.reply(`_Mode Sucessfuly Changed To: ${args}_`);
 	} else {
 		return await m.reply(`_*Mode manager*_\n_Current mode: ${config.WORK_TYPE}_\n_Use .mode public/private_`)
 }

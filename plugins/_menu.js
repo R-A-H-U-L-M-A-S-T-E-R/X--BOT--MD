@@ -123,7 +123,7 @@ Sparky({
          break;
          }
          case 'image': {
-         return await client.sendMessage(m.jid, { image: await getBuffer(config.BOT_INFO.split(";")[2]), caption: style(menu) }, { quoted: m });
+         return await m.sendFromUrl(config.BOT_INFO.split(";")[2], { caption: style(menu) }); //client.sendMessage(m.jid, { image: await getBuffer(config.BOT_INFO.split(";")[2]), caption: style(menu) }, { quoted: m });
          break;
          }
          case 'small': {

@@ -1,5 +1,5 @@
 const {Sparky, isPublic,uploadMedia,handleMediaUpload} = require("../lib");
-const {getString, appendMp3Data} = require('./pluginsCore');
+const {getString, appendMp3Data, addExifToWebP, getBuffer} = require('./pluginsCore');
 const googleTTS = require('google-tts-api');
 const config = require('../config.js');
 const lang = getString('converters');
@@ -41,13 +41,8 @@ Sparky(
         }
         try {
             m.react("⏫");
-        if (m.quoted.message.imageMessage) {
-            return await m.sendMsg(m.jid, await m.quoted.download(), { quoted: m }, 'image')
-        } else if (m.quoted.message.audioMessage) {
-            return await m.sendMsg(m.jid, await m.quoted.download(), { mimetype: "audio/mpeg", quoted: m }, 'audio')
-        } else if (m.quoted.message.videoMessage) {
-            return await m.sendMsg(m.jid, await m.quoted.download(), { quoted: m }, 'video')
-        }
+		let buff = await m.quoted.download();
+		return await m.sendFile(buff);
         } catch (e) {
             return m.react("❌");
         } 
@@ -112,17 +107,49 @@ Sparky({
 	},
 	async ({
 		m,
-		args
+		args,
+		client
 	}) => {
-		if (!m.quoted || !m.quoted.message.stickerMessage) {
+		if (!m.quoted || !(m.quoted.message.stickerMessage || m.quoted.message.audioMessage)) {
 			return await m.reply(lang.TAKE_ALERT);
 		}
 		await m.react('⏫');
-		await m.sendMsg(m.jid, await m.quoted.download(), {
-			packName: args.split(';')[0] || config.STICKER_DATA.split(';')[0],
-			authorName: args.split(';')[1] || config.STICKER_DATA.split(';')[1],
-			quoted: m
-		}, "sticker");
+			var audiomsg = m.quoted.message.audioMessage;
+    var stickermsg = m.quoted.message.stickerMessage;
+    var q = await m.quoted.download();
+    if (stickermsg) {
+        if (args!=="") {
+        var exif = {
+            author: args.includes(";")?args.split(";")[1]:"",
+            packname: args.includes(";")?args.split(";")[0]:args,
+            categories: config.STICKER_DATA.split(";")[2] || "😂",
+            android: "https://github.com/A-S-W-I-N-S-P-A-R-K-Y/X--BOT--MD",
+            ios: "https://github.com/A-S-W-I-N-S-P-A-R-K-Y/X--BOT--MD"
+        } }
+        else {
+            var exif = {
+                author: config.STICKER_DATA.split(";")[1] || "",
+                packname: config.STICKER_DATA.split(";")[0] || "",
+                categories: config.STICKER_DATA.split(";")[2] || "😂",
+                android: "https://github.com/A-S-W-I-N-S-P-A-R-K-Y/X--BOT--MD",
+                ios: "https://github.com/A-S-W-I-N-S-P-A-R-K-Y/X--BOT--MD"
+            }
+        }
+        return await client.sendMessage(m.jid,{sticker: fs.readFileSync(await addExifToWebP(q,exif))},{quoted:m})
+    }
+    if (!stickermsg && audiomsg) {
+                let inf = args !== '' ? args : config.AUDIO_DATA
+                var spl = inf.split(';')
+                var image = spl[2] ? await getBuffer(spl[2]): await getBuffer(spl[3])
+                var res = await appendMp3Data(q,spl[0],spl[1]?spl[1]:config.AUDIO_DATA.split(";")[1], 'ASWIN SPARKY', image)
+                await client.sendMessage(m.jid, {
+                    audio: res,
+                    mimetype: 'audio/mp4',
+                }, {
+                    quoted: m,
+                    ptt: false
+                });
+    }
 		return await m.react('✅');
 	});
 
