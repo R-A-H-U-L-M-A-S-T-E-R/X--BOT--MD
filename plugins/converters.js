@@ -1,5 +1,5 @@
 const {Sparky, isPublic,uploadMedia,handleMediaUpload} = require("../lib");
-const {getString, appendMp3Data, addExifToWebP, getBuffer} = require('./pluginsCore');
+const {getString, appendMp3Data, addExifToWebP, getBuffer, getJson} = require('./pluginsCore');
 const googleTTS = require('google-tts-api');
 const config = require('../config.js');
 const lang = getString('converters');
@@ -25,6 +25,26 @@ Sparky({
       m.reply('An error occurred while uploading the media.');
     }
   });
+
+Sparky(
+  {
+    name: "trt",
+    fromMe: true,
+    desc: "Translate text to a given language",
+    category: "converters",
+  },
+  async ({ client, m, args }) => {
+    try {
+      if (!args) return await m.reply('_Reply to any text with lang_\n_Eg : trt ml_');
+      const trtxt = m.quoted?.text;
+      const trtlang = args;
+      const trt = await getJson(`${config.API}/api/search/translate?text=${trtxt}&lang=${trtlang}`)
+      return m.reply(`${trt.result}`);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+);
 
 Sparky(
     {
