@@ -14,7 +14,7 @@ if (fs.existsSync("config.env")) {
 	});
 }
 
-const DATABASE_URL = process.env.DATABASE_URL || "postgresql://neondb_owner:npg_yzqIj3CEXp2d@ep-young-fire-a2xx84dw-pooler.eu-central-1.aws.neon.tech/neondb?sslmode"; // Corrected SQLite format
+const DATABASE_URL = process.env.DATABASE_URL || "postgresql://aswin:D6dq0vk1xoQx_OO-Iv4ESQ@rough-doxle-2360.7s5.aws-ap-south-1.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full"; // Corrected SQLite format
 
 if (!DATABASE_URL.startsWith("sqlite://") && !DATABASE_URL.startsWith("postgres://") && !DATABASE_URL.startsWith("postgresql://")) {
 	throw new Error("Invalid DATABASE_URL format. Use 'sqlite://' or 'postgres://'");
