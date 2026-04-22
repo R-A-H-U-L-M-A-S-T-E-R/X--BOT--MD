@@ -37,7 +37,6 @@
     "pm2": "^5.3.0",
     "qs": "latest",
     "sequelize": "^6.23.0",
-    "simple-git": "^3.27.0",
-    "sqlite3": "^5.1.6"
+    "simple-git": "^3.27.0"
   }
 }
